@@ -13,9 +13,8 @@ function getUser(userId: number): User | null {
 }
 
 export const TodoInfo = ({ todo }: Props) => {
-
   const user = getUser(todo.userId);
-  
+
   return (
     <article
       data-id={todo.id}

@@ -3,7 +3,6 @@ import { Todo, TodoList } from './components/TodoList';
 import usersFromServer from './api/users';
 import todosFromServer from './api/todos';
 import { useState } from 'react';
-import { event } from 'cypress/types/jquery';
 
 export const App = () => {
   const [title, setTitle] = useState('');
@@ -21,37 +20,37 @@ export const App = () => {
     setUserError(false);
   };
 
-  function handleSumbit(
+  const [todos, setTodos] = useState<Todo[]>(todosFromServer);
+
+  const nextId = Math.max(...todos.map(todo => todo.id), 0) + 1;
+
+  function handleSubmit(
     event: React.FormEvent,
-    title: string,
-    userId: number,
+    inputTitle: string, // renamed from 'title'
+    inputUserId: number, // renamed from 'userId'
     addTodo: (todo: Todo) => void,
   ) {
     event.preventDefault();
 
-    setTitleError(!title);
-    setUserError(!userId);
+    setTitleError(!inputTitle);
+    setUserError(!inputUserId);
 
-    if (!title || !userId) {
+    if (!inputTitle || !inputUserId) {
       return;
     }
 
-    if (title.trim() && userId) {
+    if (inputTitle.trim() && inputUserId) {
       setTitle('');
       setUserId(0);
 
       addTodo({
         id: nextId,
-        title,
-        userId,
+        title: inputTitle,
+        userId: inputUserId,
         completed: false,
       });
     }
   }
-
-  const [todos, setTodos] = useState<Todo[]>(todosFromServer);
-
-  const nextId = Math.max(...todos.map(todo => todo.id), 0) + 1;
 
   const handleAddTodo = (newTodo: Todo) => {
     setTodos(prevTodos => [...prevTodos, newTodo]);
@@ -62,7 +61,7 @@ export const App = () => {
       <h1>Add todo form</h1>
 
       <form
-        onSubmit={event => handleSumbit(event, title, userId, handleAddTodo)}
+        onSubmit={event => handleSubmit(event, title, userId, handleAddTodo)}
       >
         <div className="field">
           <label>
